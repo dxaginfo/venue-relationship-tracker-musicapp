@@ -1,0 +1,198 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  role          UserRole
+  bandId        String?
+  band          Band?          @relation(fields: [bandId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  communications Communication[]
+  reminders     Reminder[]
+  files         File[]
+}
+
+model Band {
+  id            String    @id @default(uuid())
+  name          String
+  genre         String?
+  bio           String?
+  website       String?
+  logoUrl       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  users         User[]
+  bookings      Booking[]
+}
+
+model Venue {
+  id                String              @id @default(uuid())
+  name              String
+  address           String
+  city              String
+  state             String
+  country           String
+  postalCode        String
+  capacity          Int?
+  website           String?
+  phone             String?
+  email             String?
+  rating            Float?
+  notes             String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  contacts          VenueContact[]
+  communications    Communication[]
+  bookings          Booking[]
+  requirements      VenueRequirement[]
+  tags              VenueTag[]
+}
+
+model VenueContact {
+  id            String          @id @default(uuid())
+  venueId       String
+  venue         Venue           @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  firstName     String
+  lastName      String
+  position      String?
+  email         String?
+  phone         String?
+  notes         String?
+  isPrimary     Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  communications Communication[]
+}
+
+model Communication {
+  id                String          @id @default(uuid())
+  venueId           String
+  venue             Venue           @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  contactId         String?
+  contact           VenueContact?   @relation(fields: [contactId], references: [id])
+  userId            String
+  user              User            @relation(fields: [userId], references: [id])
+  communicationType String
+  subject           String?
+  content           String?
+  communicationDate DateTime
+  followUpDate      DateTime?
+  followUpCompleted Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+model Booking {
+  id              String        @id @default(uuid())
+  venueId         String
+  venue           Venue         @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  bandId          String
+  band            Band          @relation(fields: [bandId], references: [id])
+  status          BookingStatus
+  eventDate       DateTime
+  loadInTime      DateTime?
+  setTime         DateTime?
+  endTime         DateTime?
+  paymentAmount   Float?
+  paymentStatus   String?
+  contractUrl     String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  performance     Performance?
+}
+
+model Performance {
+  id          String   @id @default(uuid())
+  bookingId   String   @unique
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  attendance  Int?
+  revenue     Float?
+  merchSales  Float?
+  rating      Float?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model VenueRequirement {
+  id        String   @id @default(uuid())
+  venueId   String
+  venue     Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  name      String
+  details   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tag {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  createdAt DateTime   @default(now())
+  venues    VenueTag[]
+}
+
+model VenueTag {
+  venueId   String
+  venue     Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([venueId, tagId])
+}
+
+model File {
+  id          String    @id @default(uuid())
+  name        String
+  type        String
+  url         String
+  size        Int
+  entityType  String
+  entityId    String
+  uploadedBy  String
+  user        User      @relation(fields: [uploadedBy], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model Reminder {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  entityType    String
+  entityId      String
+  reminderDate  DateTime
+  message       String
+  isCompleted   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  BAND_MANAGER
+  BAND_MEMBER
+  BOOKING_AGENT
+  TOUR_MANAGER
+}
+
+enum BookingStatus {
+  INQUIRY
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
