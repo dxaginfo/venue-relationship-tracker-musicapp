@@ -1,0 +1,54 @@
+{
+  "name": "venue-relationship-tracker-musicapp",
+  "version": "1.0.0",
+  "description": "A web application for musicians and bands to track venue communications, manage bookings, and maintain performance history.",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:backend && npm run install:frontend",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "start": "cd backend && npm start",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint"
+  },
+  "keywords": [
+    "venue",
+    "music",
+    "booking",
+    "management",
+    "musicians",
+    "bands",
+    "performance"
+  ],
+  "author": "DX AG <dxag.info@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dxaginfo/venue-relationship-tracker-musicapp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dxaginfo/venue-relationship-tracker-musicapp/issues"
+  },
+  "homepage": "https://github.com/dxaginfo/venue-relationship-tracker-musicapp#readme"
+}
